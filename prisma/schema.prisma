@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String?
+  surname      String?
+  email        String        @unique
+  phone        Int?
+  address      String?
+  password     String
+  verified     Boolean       @default(false)
+  role         String        @default("user")
+  Cart         Cart[]
+  Verification Verification?
+}
+
+model Verification {
+  id     String   @unique
+  userId Int      @unique
+  email  String
+  date   DateTime
+  code   Int
+  User   User     @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id      Int       @id @default(autoincrement())
+  name    String    @unique
+  Product Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Float
+  description String
+  categoryId  Int
+  Banner      Banner?
+  Cart        Cart[]
+  Category    Category @relation(fields: [categoryId], references: [id])
+}
+
+model Banner {
+  id        Int     @id @default(autoincrement())
+  image     String
+  productId Int     @unique
+  Product   Product @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  count     Int
+  Product   Product @relation(fields: [productId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+}
